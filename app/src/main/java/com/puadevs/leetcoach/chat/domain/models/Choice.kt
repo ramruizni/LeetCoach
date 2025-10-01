@@ -1,4 +1,4 @@
-package com.puadevs.leetcoach.chat.models
+package com.puadevs.leetcoach.chat.domain.models
 
 data class Choice(
     val message: Message,
