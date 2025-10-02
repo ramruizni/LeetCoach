@@ -3,13 +3,14 @@ package com.puadevs.leetcoach.voicetext.datasource
 import android.net.Uri
 import androidx.core.net.toFile
 import androidx.core.net.toUri
+import com.puadevs.leetcoach.voicetext.datasource.remote.WhisperApi
 import com.puadevs.leetcoach.voicetext.repository.VoiceTextDataSource
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
 
 class VoiceDataSourceImpl(
-    private val whisperApi: String
+    private val whisperApi: WhisperApi
 ): VoiceTextDataSource {
 
     override suspend fun retrieveTextFrom(audioUri: String): String {
@@ -22,11 +23,10 @@ class VoiceDataSourceImpl(
                 audioFile.name,
                 requestFile
             )
-            val transcription = "No se pudo grabar el audio o el archivo está vacío. "
-            return transcription
+            val result = whisperApi.transcribe(body)
+            return result.text
         } else {
-            return ""
+            return "No se pudo grabar el audio o el archivo está vacío"
         }
-
     }
 }
