@@ -81,4 +81,7 @@ dependencies {
 
     //koroutines
     implementation(libs.kotlinx.coroutines.play.services)
+
+    // interceptor
+    implementation(libs.logging.interceptor)
 }
