@@ -2,6 +2,6 @@ package com.puadevs.leetcoach.voicetext.repository
 
 interface VoiceTextDataSource {
 
-    suspend fun retrieveTextFrom(audioUri: String): String
+    suspend fun retrieveVoiceTextFrom(audioUri: String): String
     // TODO: implement suspend fun sendTextToLLM
 }

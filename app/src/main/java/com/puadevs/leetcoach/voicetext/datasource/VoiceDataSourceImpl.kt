@@ -12,7 +12,7 @@ class VoiceDataSourceImpl(
     private val whisperApi: WhisperApi
 ): VoiceTextDataSource {
 
-    override suspend fun retrieveTextFrom(audioUri: String): String {
+    override suspend fun retrieveVoiceTextFrom(audioUri: String): String {
         if (audioUri.isNotEmpty()) {
             val audioFile = audioUri.toUri().toFile()
             val requestFile =
