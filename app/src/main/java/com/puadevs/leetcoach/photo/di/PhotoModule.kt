@@ -20,8 +20,7 @@ object PhotoModule {
     @Singleton
     @Provides
     fun providePhotoDataSource(
-        @ApplicationContext context: Context,
-        imageUri: String
+        @ApplicationContext context: Context
     ): PhotoDataSource = PhotoDataSourceImpl(
         context = context.applicationContext
     )
