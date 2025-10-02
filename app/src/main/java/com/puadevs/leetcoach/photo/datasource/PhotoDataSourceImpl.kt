@@ -9,8 +9,7 @@ import com.puadevs.leetcoach.photo.repository.PhotoDataSource
 import kotlinx.coroutines.tasks.await
 
 class PhotoDataSourceImpl(
-    private val context: Context,
-    private val imageUri: String
+    private val context: Context
 ): PhotoDataSource {
 
     override suspend fun retrieveTextFrom(imageUri: String): String? {
