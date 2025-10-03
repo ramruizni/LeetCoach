@@ -6,11 +6,11 @@ class VoiceTextRepositoryImpl(
     private val voiceTextDataSource: VoiceTextDataSource
 ): VoiceTextRepository {
     override fun startRecording(audioUri: String) {
-        TODO("Not yet implemented")
+        voiceTextDataSource.stopRecording(audioUri)
     }
 
     override fun stopRecording(audioUri: String) {
-        TODO("Not yet implemented")
+        voiceTextDataSource.stopRecording(audioUri)
     }
 
     override suspend fun retrieveVoiceTextFrom(audioUri: String): String? {
