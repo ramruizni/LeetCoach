@@ -69,4 +69,18 @@ dependencies {
     //Hilt
     implementation(libs.hilt.android)
     ksp(libs.hilt.android.compiler)
+
+    // MLKit dependencies
+    implementation(libs.androidx.activity.compose.v190)
+    implementation(libs.text.recognition)
+
+    // CanHub Image Cropper
+    implementation(libs.android.image.cropper)
+    implementation(libs.android.image.cropper.v450)
+
+    //koroutines
+    implementation(libs.kotlinx.coroutines.play.services)
+
+    // interceptor
+    implementation(libs.logging.interceptor)
 }

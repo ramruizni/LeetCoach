@@ -8,6 +8,7 @@ import com.puadevs.leetcoach.chat.domain.ChatRepository
 import com.puadevs.leetcoach.chat.domain.usecases.SendMessage
 import com.puadevs.leetcoach.chat.repository.ChatDataSource
 import com.puadevs.leetcoach.chat.repository.ChatRepositoryImpl
+import com.puadevs.leetcoach.di.ChatRetrofit
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -22,6 +23,7 @@ object ChatModule {
 
     @Singleton
     @Provides
+    @ChatRetrofit
     fun provideRetrofit(): Retrofit = Retrofit.Builder()
         .baseUrl(AI_BASE_URL)
         .addConverterFactory(GsonConverterFactory.create(GsonBuilder().create()))
@@ -29,7 +31,7 @@ object ChatModule {
 
     @Singleton
     @Provides
-    fun provideLLMAPI(retrofit: Retrofit): LLMApi =
+    fun provideLLMAPI(@ChatRetrofit retrofit: Retrofit): LLMApi =
         retrofit.create(LLMApi::class.java)
 
     @Singleton
