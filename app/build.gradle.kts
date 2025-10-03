@@ -1,3 +1,6 @@
+import java.util.Properties
+import java.io.FileInputStream
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
@@ -7,6 +10,10 @@ plugins {
     id("com.google.devtools.ksp")
     id("com.google.dagger.hilt.android")
 }
+
+val secretPropertiesFile = rootProject.file("secret.properties")
+val secretProperties = Properties()
+secretProperties.load(FileInputStream(secretPropertiesFile))
 
 android {
     namespace = "com.puadevs.leetcoach"
@@ -20,6 +27,9 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
+        buildConfigField("String", "API_KEY_OPEN_AI", "\"${secretProperties["API_KEY_OPEN_AI"]}\"")
+        buildConfigField("String", "API_KEY_OPEN_ROUTER", "\"${secretProperties["API_KEY_OPEN_ROUTER"]}\"")
     }
 
     buildTypes {
@@ -40,6 +50,7 @@ android {
     }
     buildFeatures {
         compose = true
+        buildConfig = true
     }
 }
 

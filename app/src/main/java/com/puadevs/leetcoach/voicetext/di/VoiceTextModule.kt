@@ -1,9 +1,9 @@
 package com.puadevs.leetcoach.voicetext.di
 
 import com.google.gson.GsonBuilder
+import com.puadevs.leetcoach.BuildConfig
 import com.puadevs.leetcoach.di.VoiceTextRetrofit
 import com.puadevs.leetcoach.voicetext.Constants.AI_BASE_URL_OPEN_AI
-import com.puadevs.leetcoach.voicetext.Constants.WHISPER_API_KEY
 import com.puadevs.leetcoach.voicetext.datasource.VoiceDataSourceImpl
 import com.puadevs.leetcoach.voicetext.datasource.remote.WhisperApi
 import com.puadevs.leetcoach.voicetext.domain.VoiceTextRepository
@@ -27,20 +27,13 @@ object VoiceTextModule {
 
     @Singleton
     @Provides
-    @Named(WHISPER_API_KEY)
-    fun provideWhisperApiKey(): String {
-        return WHISPER_API_KEY
-    }
-
-    @Singleton
-    @Provides
     @VoiceTextRetrofit
-    fun provideVoiceTextOkHttpClient(@Named(WHISPER_API_KEY) apiKey: String): OkHttpClient {
+    fun provideVoiceTextOkHttpClient(): OkHttpClient {
         val loggingInterceptor = HttpLoggingInterceptor().apply { level = HttpLoggingInterceptor.Level.BODY }
         return OkHttpClient.Builder()
             .addInterceptor { chain ->
                 val request = chain.request().newBuilder()
-                    .addHeader("Authorization", "Bearer $apiKey")
+                    .addHeader("Authorization", "Bearer ${BuildConfig.API_KEY_OPEN_AI}")
                     .build()
                 chain.proceed(request)
             }

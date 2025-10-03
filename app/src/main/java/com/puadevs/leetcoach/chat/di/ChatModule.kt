@@ -1,6 +1,7 @@
 package com.puadevs.leetcoach.chat.di
 
 import com.google.gson.GsonBuilder
+import com.puadevs.leetcoach.BuildConfig
 import com.puadevs.leetcoach.chat.Constants.AI_BASE_URL
 import com.puadevs.leetcoach.chat.datasource.ChatDataSourceImpl
 import com.puadevs.leetcoach.chat.datasource.remote.LLMApi
@@ -39,7 +40,7 @@ object ChatModule {
     fun provideChatDataSource(
         llmApi: LLMApi
     ): ChatDataSource = ChatDataSourceImpl(
-        llmApiKey = "LLM_API_KEY",
+        llmApiKey = BuildConfig.API_KEY_OPEN_ROUTER,
         llmApi = llmApi
     )
 
