@@ -1,5 +1,6 @@
 package com.puadevs.leetcoach.voicetext.datasource
 
+import android.util.Log
 import androidx.core.net.toFile
 import androidx.core.net.toUri
 import com.puadevs.leetcoach.voicetext.datasource.remote.WhisperApi
@@ -12,8 +13,8 @@ class VoiceDataSourceImpl(
     private val whisperApi: WhisperApi
 ): VoiceTextDataSource {
 
-    override suspend fun retrieveVoiceTextFrom(audioUri: String): String {
-        if (audioUri.isNotEmpty()) {
+    override suspend fun retrieveVoiceTextFrom(audioUri: String): String? {
+        return try {
             val audioFile = audioUri.toUri().toFile()
             val requestFile =
                 RequestBody.create("audio/m4a".toMediaType(), audioFile)
@@ -22,10 +23,13 @@ class VoiceDataSourceImpl(
                 audioFile.name,
                 requestFile
             )
-            val result = whisperApi.transcribe(body)
-            return result.text
-        } else {
-            return "No se pudo grabar el audio o el archivo está vacío"
+            whisperApi.transcribe(body).text
+        } catch (e: Exception) {
+            Log.e(TAG, "Text recognition failed: ${e.message}")
+            null
         }
+    }
+    companion object {
+        const val TAG = "VoiceDataSource"
     }
 }
