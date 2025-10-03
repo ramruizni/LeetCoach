@@ -20,7 +20,7 @@ class PhotoDataSourceImpl(
         return try {
             recognizer
                 .process(image)
-                .await().text.ifEmpty { "No se encontró texto en la imagen." }
+                .await().text
         } catch (e: Exception) {
             Log.e(TAG, "Text recognition failed: ${e.message}")
             null
