@@ -71,7 +71,6 @@ dependencies {
     ksp(libs.hilt.android.compiler)
 
     // MLKit dependencies
-
     implementation(libs.androidx.activity.compose.v190)
     implementation(libs.text.recognition)
 
