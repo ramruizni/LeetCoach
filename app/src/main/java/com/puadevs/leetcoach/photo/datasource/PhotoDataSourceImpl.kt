@@ -1,6 +1,7 @@
 package com.puadevs.leetcoach.photo.datasource
 
 import android.content.Context
+import android.util.Log
 import androidx.core.net.toUri
 import com.google.mlkit.vision.common.InputImage
 import com.google.mlkit.vision.text.TextRecognition
@@ -10,17 +11,23 @@ import kotlinx.coroutines.tasks.await
 
 class PhotoDataSourceImpl(
     private val context: Context
-): PhotoDataSource {
+) : PhotoDataSource {
 
     override suspend fun retrieveTextFrom(imageUri: String): String? {
         val image = InputImage.fromFilePath(context, imageUri.toUri())
         val recognizer = TextRecognition.getClient(TextRecognizerOptions.DEFAULT_OPTIONS)
 
-        try {
-            val visionText = recognizer.process(image).await()
-            return visionText.text.ifEmpty { "No se encontró texto en la imagen." }
+        return try {
+            recognizer
+                .process(image)
+                .await().text.ifEmpty { "No se encontró texto en la imagen." }
         } catch (e: Exception) {
-            throw Exception("Falló el reconocimiento de texto: ${e.localizedMessage}", e)
+            Log.e(TAG, "Text recognition failed: ${e.message}")
+            null
         }
+    }
+
+    companion object {
+        const val TAG = "PhotoDataSource"
     }
 }
