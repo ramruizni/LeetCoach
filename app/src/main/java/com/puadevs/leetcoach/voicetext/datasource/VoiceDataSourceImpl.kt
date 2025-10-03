@@ -1,5 +1,6 @@
 package com.puadevs.leetcoach.voicetext.datasource
 
+import android.media.MediaRecorder
 import android.util.Log
 import androidx.core.net.toFile
 import androidx.core.net.toUri
@@ -10,8 +11,30 @@ import okhttp3.MultipartBody
 import okhttp3.RequestBody
 
 class VoiceDataSourceImpl(
-    private val whisperApi: WhisperApi
+    private val whisperApi: WhisperApi,
 ): VoiceTextDataSource {
+
+    private var mediaRecorder: MediaRecorder? = null
+
+    override fun startRecording(audioUri: String) {
+        mediaRecorder = MediaRecorder().apply {
+            setAudioSource(MediaRecorder.AudioSource.MIC)
+            setOutputFormat(MediaRecorder.OutputFormat.MPEG_4)
+            setAudioEncoder(MediaRecorder.AudioEncoder.AAC)
+            setOutputFile(audioUri)
+            prepare()
+            start()
+        }
+    }
+
+    override fun stopRecording(audioUri: String) {
+        mediaRecorder?.apply {
+            stop()
+            release()
+        }
+        mediaRecorder = null
+    }
+
 
     override suspend fun retrieveVoiceTextFrom(audioUri: String): String? {
         return try {
