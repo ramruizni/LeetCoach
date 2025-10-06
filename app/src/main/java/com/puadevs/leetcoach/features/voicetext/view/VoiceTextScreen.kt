@@ -1,7 +1,6 @@
 package com.puadevs.leetcoach.features.voicetext.view
 
 import android.Manifest
-import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Column
@@ -13,16 +12,12 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
-import androidx.core.net.toUri
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.puadevs.leetcoach.features.voicetext.viewmodel.VoiceTextViewModel
-import java.io.File
 
 @Composable
 fun VoiceTextScreen(
@@ -30,11 +25,7 @@ fun VoiceTextScreen(
 ) {
     Scaffold { innerPadding ->
 
-        val context = LocalContext.current
-
         val audioState by viewModel.audioState.collectAsStateWithLifecycle()
-
-        val TAG = "audioFile"
 
         val permissionLauncher = rememberLauncherForActivityResult(
             ActivityResultContracts.RequestPermission()
@@ -48,11 +39,6 @@ fun VoiceTextScreen(
         LaunchedEffect(Unit) {
             permissionLauncher.launch(Manifest.permission.RECORD_AUDIO)
         }
-
-        val audioFile = remember {
-            File(context.externalCacheDir, "recorded_audio.m4a")
-        }
-
 
         Column(
             modifier = Modifier
@@ -69,7 +55,7 @@ fun VoiceTextScreen(
                         }
                         viewModel.setStartButtonEnabled(false)
                         viewModel.setStopButtonEnabled(true)
-                        viewModel.start(audioUri = audioFile.toString())
+                        viewModel.start()
                     },
                     enabled = audioState.startButtonEnabled
                 ) {
@@ -81,9 +67,8 @@ fun VoiceTextScreen(
                     onClick = {
                         viewModel.setStopButtonEnabled(false)
                         viewModel.setStartButtonEnabled(true)
-                        viewModel.stop(audioUri = audioFile.toString())
-                        viewModel.transcriptAudio(audioUri = audioFile.toUri().toString())
-                        Log.d(TAG, "Valor actual de audiofile: $audioFile")
+                        viewModel.stop()
+                        viewModel.transcriptAudio()
                     },
                     enabled = audioState.stopButtonEnabled
                 ) {

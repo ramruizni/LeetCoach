@@ -26,10 +26,10 @@ class VoiceTextViewModel @Inject constructor(
     private val retrieveVoiceTextFrom: RetrieveVoiceTextFrom,
     private val startRecording: StartRecording,
     private val stopRecording: StopRecording,
-//    application: Application
+    application: Application
 ) : ViewModel() {
 
-//    private val audioFile: String = File(application.externalCacheDir, "recorded_audio.m4a").toURI().toString()
+    private val audioFile: File = File(application.externalCacheDir, "recorded_audio.m4a")
 
     private val _audioState = MutableStateFlow(AudioState())
     val audioState = _audioState.asStateFlow()
@@ -50,22 +50,22 @@ class VoiceTextViewModel @Inject constructor(
         _audioState.update { it.copy(stopButtonEnabled = stopButtonEnabled) }
     }
 
-    fun start(audioUri: String) {
+    fun start() {
         viewModelScope.launch(Dispatchers.IO) {
-            startRecording(audioUri = audioUri)
+            startRecording(audioUri = audioFile.toString())
         }
     }
 
-    fun stop(audioUri: String) {
+    fun stop() {
         viewModelScope.launch(Dispatchers.IO) {
             _audioState.update { it.copy(transcription = "Transcribing") }
-            stopRecording(audioUri = audioUri)
+            stopRecording(audioUri = audioFile.toString())
         }
     }
 
-    fun transcriptAudio(audioUri: String) {
+    fun transcriptAudio() {
         viewModelScope.launch(Dispatchers.IO) {
-            val transcript = retrieveVoiceTextFrom(audioUri = audioUri)
+            val transcript = retrieveVoiceTextFrom(audioUri = audioFile.toURI().toString())
             if (transcript != null) {
                 _audioState.update { it.copy(transcription = transcript) }
             } else {
@@ -73,5 +73,4 @@ class VoiceTextViewModel @Inject constructor(
             }
         }
     }
-
 }
