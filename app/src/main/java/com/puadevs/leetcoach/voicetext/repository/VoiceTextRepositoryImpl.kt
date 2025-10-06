@@ -6,7 +6,7 @@ class VoiceTextRepositoryImpl(
     private val voiceTextDataSource: VoiceTextDataSource
 ): VoiceTextRepository {
     override fun startRecording(audioUri: String) {
-        voiceTextDataSource.stopRecording(audioUri)
+        voiceTextDataSource.startRecording(audioUri)
     }
 
     override fun stopRecording(audioUri: String) {
