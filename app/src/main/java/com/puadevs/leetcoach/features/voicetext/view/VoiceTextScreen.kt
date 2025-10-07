@@ -30,8 +30,8 @@ fun VoiceTextScreen(
 
     val audioState by viewModel.audioState.collectAsStateWithLifecycle()
 
-    val audioUri = remember {
-        File(context.externalCacheDir, "recorded_audio.m4a").toString()
+    val audioFile = remember {
+        File(context.externalCacheDir, "recorded_audio.m4a")
     }
 
     Scaffold { innerPadding ->
@@ -63,7 +63,7 @@ fun VoiceTextScreen(
                         }
                         viewModel.setStartButtonEnabled(false)
                         viewModel.setStopButtonEnabled(true)
-                        viewModel.start(audioUri = audioUri)
+                        viewModel.start(audioUri = audioFile.toString())
                     },
                     enabled = audioState.startButtonEnabled
                 ) {
@@ -75,7 +75,7 @@ fun VoiceTextScreen(
                     onClick = {
                         viewModel.setStopButtonEnabled(false)
                         viewModel.setStartButtonEnabled(true)
-                        viewModel.stop()
+                        viewModel.stop(audioUri = audioFile.toURI().toString())
                     },
                     enabled = audioState.stopButtonEnabled
                 ) {

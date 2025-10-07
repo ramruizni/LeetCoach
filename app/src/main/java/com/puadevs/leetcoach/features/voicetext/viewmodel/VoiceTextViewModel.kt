@@ -27,8 +27,6 @@ class VoiceTextViewModel @Inject constructor(
     private val stopRecording: StopRecording,
 ) : ViewModel() {
 
-    private var audioUri: String = ""
-
     private val _audioState = MutableStateFlow(AudioState())
     val audioState = _audioState.asStateFlow()
 
@@ -49,13 +47,12 @@ class VoiceTextViewModel @Inject constructor(
     }
 
     fun start(audioUri: String) {
-        this.audioUri = audioUri
         viewModelScope.launch(Dispatchers.IO) {
             startRecording(audioUri = audioUri)
         }
     }
 
-    fun stop() {
+    fun stop(audioUri: String) {
         viewModelScope.launch(Dispatchers.IO) {
             _audioState.update { it.copy(transcription = "Transcribing") }
             stopRecording()
