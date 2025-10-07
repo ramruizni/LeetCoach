@@ -59,7 +59,7 @@ class VoiceTextViewModel @Inject constructor(
     fun stop() {
         viewModelScope.launch(Dispatchers.IO) {
             _audioState.update { it.copy(transcription = "Transcribing") }
-            stopRecording(audioUri = audioFile.toString())
+            stopRecording()
         }
     }
 

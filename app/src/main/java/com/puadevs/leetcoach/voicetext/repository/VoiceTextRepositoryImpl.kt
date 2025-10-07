@@ -9,8 +9,8 @@ class VoiceTextRepositoryImpl(
         voiceTextDataSource.startRecording(audioUri)
     }
 
-    override fun stopRecording(audioUri: String) {
-        voiceTextDataSource.stopRecording(audioUri)
+    override fun stopRecording() {
+        voiceTextDataSource.stopRecording()
     }
 
     override suspend fun retrieveVoiceTextFrom(audioUri: String): String? {

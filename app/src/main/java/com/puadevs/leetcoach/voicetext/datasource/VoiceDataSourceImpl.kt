@@ -27,7 +27,7 @@ class VoiceDataSourceImpl(
         }
     }
 
-    override fun stopRecording(audioUri: String) {
+    override fun stopRecording() {
         mediaRecorder?.apply {
             stop()
             release()

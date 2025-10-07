@@ -4,7 +4,7 @@ interface VoiceTextDataSource {
 
     fun startRecording(audioUri: String)
 
-    fun stopRecording(audioUri: String)
+    fun stopRecording()
 
     suspend fun retrieveVoiceTextFrom(audioUri: String): String?
 }
