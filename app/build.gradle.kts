@@ -94,4 +94,7 @@ dependencies {
 
     // interceptor
     implementation(libs.logging.interceptor)
+
+    //viewModel
+    implementation(libs.androidx.lifecycle.viewmodel.compose)
 }
