@@ -5,11 +5,11 @@ import com.puadevs.leetcoach.voicetext.domain.VoiceTextRepository
 class VoiceTextRepositoryImpl(
     private val voiceTextDataSource: VoiceTextDataSource
 ): VoiceTextRepository {
-    override fun startRecording(audioUri: String) {
+    override suspend fun startRecording(audioUri: String) {
         voiceTextDataSource.startRecording(audioUri)
     }
 
-    override fun stopRecording() {
+    override suspend fun stopRecording() {
         voiceTextDataSource.stopRecording()
     }
 

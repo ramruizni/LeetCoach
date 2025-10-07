@@ -29,11 +29,10 @@ class VoiceTextViewModel @Inject constructor(
     application: Application
 ) : ViewModel() {
 
-    private val audioFile: File = File(application.externalCacheDir, "recorded_audio.m4a")
+    val audioFile = File(application.externalCacheDir, "recorded_audio.m4a")
 
     private val _audioState = MutableStateFlow(AudioState())
     val audioState = _audioState.asStateFlow()
-
 
     fun setPermissionGranted(permissionGranted: Boolean) {
         _audioState.update { it.copy(permissionGranted = permissionGranted) }
@@ -60,11 +59,6 @@ class VoiceTextViewModel @Inject constructor(
         viewModelScope.launch(Dispatchers.IO) {
             _audioState.update { it.copy(transcription = "Transcribing") }
             stopRecording()
-        }
-    }
-
-    fun transcriptAudio() {
-        viewModelScope.launch(Dispatchers.IO) {
             val transcript = retrieveVoiceTextFrom(audioUri = audioFile.toURI().toString())
             if (transcript != null) {
                 _audioState.update { it.copy(transcription = transcript) }

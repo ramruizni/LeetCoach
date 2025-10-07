@@ -68,7 +68,6 @@ fun VoiceTextScreen(
                         viewModel.setStopButtonEnabled(false)
                         viewModel.setStartButtonEnabled(true)
                         viewModel.stop()
-                        viewModel.transcriptAudio()
                     },
                     enabled = audioState.stopButtonEnabled
                 ) {
