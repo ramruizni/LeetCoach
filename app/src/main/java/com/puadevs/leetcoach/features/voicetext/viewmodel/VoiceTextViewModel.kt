@@ -1,6 +1,5 @@
 package com.puadevs.leetcoach.features.voicetext.viewmodel
 
-import android.app.Application
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.puadevs.leetcoach.voicetext.domain.usecases.RetrieveVoiceTextFrom
@@ -12,7 +11,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import java.io.File
 import javax.inject.Inject
 
 data class AudioState(
@@ -20,16 +18,16 @@ data class AudioState(
     val transcription: String = "",
     val startButtonEnabled: Boolean = true,
     val stopButtonEnabled: Boolean = false
-        )
+)
+
 @HiltViewModel
 class VoiceTextViewModel @Inject constructor(
     private val retrieveVoiceTextFrom: RetrieveVoiceTextFrom,
     private val startRecording: StartRecording,
     private val stopRecording: StopRecording,
-    application: Application
 ) : ViewModel() {
 
-    val audioFile = File(application.externalCacheDir, "recorded_audio.m4a")
+    private var audioUri: String = ""
 
     private val _audioState = MutableStateFlow(AudioState())
     val audioState = _audioState.asStateFlow()
@@ -37,6 +35,7 @@ class VoiceTextViewModel @Inject constructor(
     fun setPermissionGranted(permissionGranted: Boolean) {
         _audioState.update { it.copy(permissionGranted = permissionGranted) }
     }
+
     fun setTranscription(transcription: String) {
         _audioState.update { it.copy(transcription = transcription) }
     }
@@ -49,9 +48,10 @@ class VoiceTextViewModel @Inject constructor(
         _audioState.update { it.copy(stopButtonEnabled = stopButtonEnabled) }
     }
 
-    fun start() {
+    fun start(audioUri: String) {
+        this.audioUri = audioUri
         viewModelScope.launch(Dispatchers.IO) {
-            startRecording(audioUri = audioFile.toString())
+            startRecording(audioUri = audioUri)
         }
     }
 
@@ -59,7 +59,7 @@ class VoiceTextViewModel @Inject constructor(
         viewModelScope.launch(Dispatchers.IO) {
             _audioState.update { it.copy(transcription = "Transcribing") }
             stopRecording()
-            val transcript = retrieveVoiceTextFrom(audioUri = audioFile.toURI().toString())
+            val transcript = retrieveVoiceTextFrom(audioUri)
             if (transcript != null) {
                 _audioState.update { it.copy(transcription = transcript) }
             } else {

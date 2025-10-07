@@ -12,21 +12,29 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.puadevs.leetcoach.features.voicetext.viewmodel.VoiceTextViewModel
+import java.io.File
 
 @Composable
 fun VoiceTextScreen(
     viewModel: VoiceTextViewModel = viewModel()
 ) {
+    val context = LocalContext.current
+
+    val audioState by viewModel.audioState.collectAsStateWithLifecycle()
+
+    val audioUri = remember {
+        File(context.externalCacheDir, "recorded_audio.m4a").toString()
+    }
+
     Scaffold { innerPadding ->
-
-        val audioState by viewModel.audioState.collectAsStateWithLifecycle()
-
         val permissionLauncher = rememberLauncherForActivityResult(
             ActivityResultContracts.RequestPermission()
         ) { granted ->
@@ -45,7 +53,7 @@ fun VoiceTextScreen(
                 .padding(innerPadding)
                 .padding(24.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
-            ) {
+        ) {
             Row() {
                 Button(
                     onClick = {
@@ -55,7 +63,7 @@ fun VoiceTextScreen(
                         }
                         viewModel.setStartButtonEnabled(false)
                         viewModel.setStopButtonEnabled(true)
-                        viewModel.start()
+                        viewModel.start(audioUri = audioUri)
                     },
                     enabled = audioState.startButtonEnabled
                 ) {
