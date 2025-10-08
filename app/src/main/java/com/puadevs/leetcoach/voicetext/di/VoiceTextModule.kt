@@ -8,6 +8,8 @@ import com.puadevs.leetcoach.voicetext.datasource.VoiceDataSourceImpl
 import com.puadevs.leetcoach.voicetext.datasource.remote.WhisperApi
 import com.puadevs.leetcoach.voicetext.domain.VoiceTextRepository
 import com.puadevs.leetcoach.voicetext.domain.usecases.RetrieveVoiceTextFrom
+import com.puadevs.leetcoach.voicetext.domain.usecases.StartRecording
+import com.puadevs.leetcoach.voicetext.domain.usecases.StopRecording
 import com.puadevs.leetcoach.voicetext.repository.VoiceTextDataSource
 import com.puadevs.leetcoach.voicetext.repository.VoiceTextRepositoryImpl
 import dagger.Module
@@ -18,7 +20,6 @@ import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
-import javax.inject.Named
 import javax.inject.Singleton
 
 @Module
@@ -29,7 +30,8 @@ object VoiceTextModule {
     @Provides
     @VoiceTextRetrofit
     fun provideVoiceTextOkHttpClient(): OkHttpClient {
-        val loggingInterceptor = HttpLoggingInterceptor().apply { level = HttpLoggingInterceptor.Level.BODY }
+        val loggingInterceptor =
+            HttpLoggingInterceptor().apply { level = HttpLoggingInterceptor.Level.BODY }
         return OkHttpClient.Builder()
             .addInterceptor { chain ->
                 val request = chain.request().newBuilder()
@@ -40,6 +42,7 @@ object VoiceTextModule {
             .addInterceptor(loggingInterceptor)
             .build()
     }
+
     @Singleton
     @Provides
     @VoiceTextRetrofit
@@ -82,4 +85,21 @@ object VoiceTextModule {
     ): RetrieveVoiceTextFrom = RetrieveVoiceTextFrom(
         voiceTextRepository = voiceTextRepository
     )
+
+    @Singleton
+    @Provides
+    fun provideStartRecording(
+        voiceTextRepository: VoiceTextRepository
+    ): StartRecording = StartRecording(
+        voiceTextRepository = voiceTextRepository
+    )
+
+    @Singleton
+    @Provides
+    fun provideStopRecording(
+        voiceTextRepository: VoiceTextRepository
+    ): StopRecording = StopRecording(
+        voiceTextRepository = voiceTextRepository
+    )
+
 }

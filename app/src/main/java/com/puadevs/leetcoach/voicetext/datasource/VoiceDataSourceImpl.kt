@@ -16,7 +16,7 @@ class VoiceDataSourceImpl(
 
     private var mediaRecorder: MediaRecorder? = null
 
-    override fun startRecording(audioUri: String) {
+    override suspend fun startRecording(audioUri: String) {
         mediaRecorder = MediaRecorder().apply {
             setAudioSource(MediaRecorder.AudioSource.MIC)
             setOutputFormat(MediaRecorder.OutputFormat.MPEG_4)
@@ -27,7 +27,7 @@ class VoiceDataSourceImpl(
         }
     }
 
-    override fun stopRecording(audioUri: String) {
+    override suspend fun stopRecording() {
         mediaRecorder?.apply {
             stop()
             release()
