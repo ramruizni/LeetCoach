@@ -1,7 +1,5 @@
 package com.puadevs.leetcoach.features.photo.viewmodel
 
-import android.content.Context
-import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.puadevs.leetcoach.photo.domain.usecases.RetrieveTextFrom
@@ -17,7 +15,8 @@ import javax.inject.Inject
 
 data class PhotoState(
    val photoUri: String? = null,
-   val recognizedText: String? = null
+   val recognizedText: String? = null,
+   val buttonEnabled: Boolean = true
 )
 @HiltViewModel
 class PhotoViewModel @Inject constructor(
@@ -33,6 +32,10 @@ class PhotoViewModel @Inject constructor(
 
    fun setPhotoUri(photoUri: String) {
       _photoState.update { it.copy(photoUri = photoUri) }
+   }
+
+   fun setButtonEnabled(buttonEnabled: Boolean) {
+      _photoState.update { it.copy(buttonEnabled = buttonEnabled) }
    }
 
    fun getRecognizedText(stringUri: String) {

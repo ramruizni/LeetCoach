@@ -1,8 +1,6 @@
 package com.puadevs.leetcoach.features.voicetext.view
 
 import android.Manifest
-import android.util.Log
-import android.widget.Button
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -31,7 +29,6 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.rememberAsyncImagePainter
 import com.puadevs.leetcoach.features.photo.viewmodel.PhotoViewModel
 import com.puadevs.leetcoach.features.voicetext.viewmodel.VoiceTextViewModel
-import kotlinx.coroutines.launch
 import java.io.File
 
 @Composable
@@ -98,7 +95,7 @@ fun VoiceTextScreen(
                 .padding(24.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
-            photoState.photoUri?.toUri()?.let {
+            photoState.photoUri?.toUri().let {
                 Image(
                     painter = rememberAsyncImagePainter(it),
                     contentDescription = "Captured photo",
@@ -110,36 +107,28 @@ fun VoiceTextScreen(
             Row() {
                 Button(
                     onClick = {
-                        if (!audioState.permissionGranted) {
-                            permissionLauncher.launch(Manifest.permission.RECORD_AUDIO)
-                            return@Button
+                        if (audioState.isRecording) {
+                            viewModel.stop(audioUri = audioFile.toURI().toString())
+                            viewModel.setIsRecording(false)
+                            viewModel.setTextButton("Start")
+                            photoViewModel.setButtonEnabled(true)
+                        } else {
+                            viewModel.start(audioUri = audioFile.toString())
+                            viewModel.setIsRecording(true)
+                            viewModel.setTextButton("Stop")
+                            photoViewModel.setButtonEnabled(false)
                         }
-                        viewModel.setStartButtonEnabled(false)
-                        viewModel.setStopButtonEnabled(true)
-                        viewModel.start(audioUri = audioFile.toString())
-                    },
-                    enabled = audioState.startButtonEnabled
+                    }
                 ) {
                     Text(
-                        text = "Start"
-                    )
-                }
-                Button(
-                    onClick = {
-                        viewModel.setStopButtonEnabled(false)
-                        viewModel.setStartButtonEnabled(true)
-                        viewModel.stop(audioUri = audioFile.toURI().toString())
-                    },
-                    enabled = audioState.stopButtonEnabled
-                ) {
-                    Text(
-                        text = "Stop"
+                        text = audioState.textButton
                     )
                 }
                 Button(
                     onClick = {
                         cameraLauncher.launch(uri)
-                    }
+                    },
+                    enabled = photoState.buttonEnabled
                 ) {
                     Text(
                         text = "Take photo"

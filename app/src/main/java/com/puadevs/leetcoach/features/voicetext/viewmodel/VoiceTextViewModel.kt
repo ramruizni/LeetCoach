@@ -16,8 +16,8 @@ import javax.inject.Inject
 data class AudioState(
     val permissionGranted: Boolean = false,
     val transcription: String = "",
-    val startButtonEnabled: Boolean = true,
-    val stopButtonEnabled: Boolean = false
+    val isRecording: Boolean = false,
+    val textButton: String = "Start",
 )
 
 @HiltViewModel
@@ -38,12 +38,12 @@ class VoiceTextViewModel @Inject constructor(
         _audioState.update { it.copy(transcription = transcription) }
     }
 
-    fun setStartButtonEnabled(startButtonEnabled: Boolean) {
-        _audioState.update { it.copy(startButtonEnabled = startButtonEnabled) }
+    fun setIsRecording(isRecording: Boolean) {
+        _audioState.update { it.copy(isRecording = isRecording) }
     }
 
-    fun setStopButtonEnabled(stopButtonEnabled: Boolean) {
-        _audioState.update { it.copy(stopButtonEnabled = stopButtonEnabled) }
+    fun setTextButton(textButton: String) {
+        _audioState.update { it.copy(textButton = textButton) }
     }
 
     fun start(audioUri: String) {
