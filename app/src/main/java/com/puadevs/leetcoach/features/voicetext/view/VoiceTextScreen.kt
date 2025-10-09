@@ -46,7 +46,7 @@ fun VoiceTextScreen(
     }
 
     val photoFile = remember {
-        File.createTempFile("photo_", ".jpg", context.externalCacheDir)
+        File(context.externalCacheDir, "photo.jpg")
     }
 
     val uri = FileProvider.getUriForFile(
