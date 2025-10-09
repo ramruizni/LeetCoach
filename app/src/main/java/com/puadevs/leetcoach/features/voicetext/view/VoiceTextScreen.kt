@@ -6,6 +6,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.Button
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -19,33 +20,37 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.puadevs.leetcoach.features.chat.viewmodel.ChatViewModel
 import com.puadevs.leetcoach.features.voicetext.viewmodel.VoiceTextViewModel
 import java.io.File
 
 @Composable
 fun VoiceTextScreen(
     // TODO: Inject ChatViewModel
-    viewModel: VoiceTextViewModel = viewModel()
+    viewModel: VoiceTextViewModel = viewModel(),
+    chatViewModel: ChatViewModel = viewModel()
 ) {
     val context = LocalContext.current
 
     val audioState by viewModel.audioState.collectAsStateWithLifecycle()
+    val chatState by chatViewModel.chatState.collectAsStateWithLifecycle()
     // TODO: Collect state from chatViewModel
 
     val audioFile = remember {
         File(context.externalCacheDir, "recorded_audio.m4a")
     }
 
-    Scaffold { innerPadding ->
-        val permissionLauncher = rememberLauncherForActivityResult(
-            ActivityResultContracts.RequestPermission()
-        ) { granted ->
-            viewModel.setPermissionGranted(granted)
-        }
+    val permissionLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ) { granted ->
+        viewModel.setPermissionGranted(granted)
+    }
 
-        LaunchedEffect(Unit) {
-            permissionLauncher.launch(Manifest.permission.RECORD_AUDIO)
-        }
+    LaunchedEffect(Unit) {
+        permissionLauncher.launch(Manifest.permission.RECORD_AUDIO)
+    }
+
+    Scaffold { innerPadding ->
 
         Column(
             modifier = Modifier
@@ -75,8 +80,7 @@ fun VoiceTextScreen(
                         viewModel.setStopButtonEnabled(false)
                         viewModel.setStartButtonEnabled(true)
                         viewModel.stop(audioUri = audioFile.toURI().toString()) { text ->
-                            // TODO: Send message to ChatVM
-                            //chatViewModel.sendMessage(text)
+                            chatViewModel.receiveVoiceMessage(text = text)
                         }
                     },
                     enabled = audioState.stopButtonEnabled
@@ -86,11 +90,21 @@ fun VoiceTextScreen(
                     )
                 }
             }
-            // TODO: show chatViewModel.transcription?.orEmpty()
-            Text(
-                //text = audioState.transcription
-                text = "chatViewModel.transcription?.orEmpty()"
-            )
+            LazyColumn(
+                modifier = Modifier
+                    .padding(innerPadding)
+                    .padding(24.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+            ) {
+                items(
+                    count = chatState.size
+                ) {
+                    Text(
+                        text = chatState[it]
+                    )
+                }
+            }
         }
+
     }
 }
