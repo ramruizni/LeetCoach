@@ -59,8 +59,8 @@ fun VoiceTextScreen(
         contract = ActivityResultContracts.TakePicture()
     ) { success ->
         if (success) {
-            photoViewModel.setPhotoUri(uri.toString())
-            photoViewModel.getRecognizedText(uri.toString())
+            photoViewModel.setPhotoUri(photoFile.toURI().toString())
+            photoViewModel.getRecognizedText(photoFile.toURI().toString())
         }
     }
 
