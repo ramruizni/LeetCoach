@@ -110,18 +110,16 @@ fun VoiceTextScreen(
                         if (audioState.isRecording) {
                             viewModel.stop(audioUri = audioFile.toURI().toString())
                             viewModel.setIsRecording(false)
-                            viewModel.setTextButton("Start")
                             photoViewModel.setButtonEnabled(true)
                         } else {
                             viewModel.start(audioUri = audioFile.toString())
                             viewModel.setIsRecording(true)
-                            viewModel.setTextButton("Stop")
                             photoViewModel.setButtonEnabled(false)
                         }
                     }
                 ) {
                     Text(
-                        text = audioState.textButton
+                        text = if (audioState.isRecording) "Stop" else "Start"
                     )
                 }
                 Button(

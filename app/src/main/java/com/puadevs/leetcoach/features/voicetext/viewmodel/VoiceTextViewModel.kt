@@ -17,7 +17,6 @@ data class AudioState(
     val permissionGranted: Boolean = false,
     val transcription: String = "",
     val isRecording: Boolean = false,
-    val textButton: String = "Start",
 )
 
 @HiltViewModel
@@ -40,10 +39,6 @@ class VoiceTextViewModel @Inject constructor(
 
     fun setIsRecording(isRecording: Boolean) {
         _audioState.update { it.copy(isRecording = isRecording) }
-    }
-
-    fun setTextButton(textButton: String) {
-        _audioState.update { it.copy(textButton = textButton) }
     }
 
     fun start(audioUri: String) {
