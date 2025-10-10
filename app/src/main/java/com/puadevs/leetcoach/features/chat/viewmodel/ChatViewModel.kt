@@ -21,8 +21,7 @@ class ChatViewModel @Inject constructor(
 
     fun receiveVoiceMessage(text: String) {
         viewModelScope.launch(Dispatchers.IO) {
-//            _chatState.value = _chatState.value + sendMessage(text)
-            sendMessage(message = text)
+            _chatState.value = _chatState.value + sendMessage(text).orEmpty()
         }
     }
 }
