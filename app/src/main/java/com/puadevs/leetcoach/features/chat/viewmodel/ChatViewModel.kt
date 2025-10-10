@@ -7,7 +7,6 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -22,7 +21,8 @@ class ChatViewModel @Inject constructor(
 
     fun receiveVoiceMessage(text: String) {
         viewModelScope.launch(Dispatchers.IO) {
-            _chatState.value = _chatState.value + sendMessage(text)
+//            _chatState.value = _chatState.value + sendMessage(text)
+            sendMessage(message = text)
         }
     }
 }
