@@ -19,6 +19,7 @@ class ChatViewModel @Inject constructor(
     private val _chatState = MutableStateFlow<List<String>>(emptyList())
     val chatState = _chatState.asStateFlow()
 
+    // TODO: Rename to receiveMessage or something not related to voice, since we send photo text as well
     fun receiveVoiceMessage(text: String) {
         viewModelScope.launch(Dispatchers.IO) {
             _chatState.value = _chatState.value + sendMessage(text).orEmpty()

@@ -28,20 +28,20 @@ import androidx.core.net.toUri
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.rememberAsyncImagePainter
-import com.puadevs.leetcoach.features.photo.viewmodel.PhotoViewModel
 import com.puadevs.leetcoach.features.chat.viewmodel.ChatViewModel
+import com.puadevs.leetcoach.features.photo.viewmodel.PhotoViewModel
 import com.puadevs.leetcoach.features.voicetext.viewmodel.VoiceTextViewModel
 import java.io.File
 
 @Composable
 fun VoiceTextScreen(
-    viewModel: VoiceTextViewModel = viewModel(),
     chatViewModel: ChatViewModel = viewModel(),
-    photoViewModel: PhotoViewModel = viewModel()
+    photoViewModel: PhotoViewModel = viewModel(),
+    voiceTextViewModel: VoiceTextViewModel = viewModel(),
 ) {
     val context = LocalContext.current
 
-    val audioState by viewModel.audioState.collectAsStateWithLifecycle()
+    val audioState by voiceTextViewModel.audioState.collectAsStateWithLifecycle()
     val chatState by chatViewModel.chatState.collectAsStateWithLifecycle()
     val photoState by photoViewModel.photoState.collectAsStateWithLifecycle()
 
@@ -63,15 +63,16 @@ fun VoiceTextScreen(
         contract = ActivityResultContracts.TakePicture()
     ) { success ->
         if (success) {
-            photoViewModel.setPhotoUri(photoFile.toURI().toString())
-            photoViewModel.getRecognizedText(photoFile.toURI().toString())
+            //photoViewModel.setPhotoUri(photoFile.toURI().toString())
+            //photoViewModel.getRecognizedText(photoFile.toURI().toString())
+            // TODO: chatViewModel.receiveVoiceMessage(text)
         }
     }
 
     val permissionLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.RequestPermission()
     ) { granted ->
-        viewModel.setPermissionGranted(granted)
+        voiceTextViewModel.setPermissionGranted(granted)
     }
 
     LaunchedEffect(Unit) {
@@ -105,39 +106,26 @@ fun VoiceTextScreen(
                         .height(200.dp)
                 )
             }
-            Row() {
+            Row {
                 Button(
                     onClick = {
                         if (audioState.isRecording) {
-                            viewModel.stop(audioUri = audioFile.toURI().toString()) { text ->
-                                // TODO: Send message to ChatVM
-                                //chatViewModel.sendMessage(text)
+                            voiceTextViewModel.stop(
+                                audioUri = audioFile.toURI().toString()
+                            ) { text ->
+                                chatViewModel.receiveVoiceMessage(text)
                             }
-                            viewModel.setIsRecording(false)
+                            voiceTextViewModel.setIsRecording(false)
                             photoViewModel.setButtonEnabled(true)
                         } else {
-                            viewModel.start(audioUri = audioFile.toString())
-                            viewModel.setIsRecording(true)
+                            voiceTextViewModel.start(audioUri = audioFile.toString())
+                            voiceTextViewModel.setIsRecording(true)
                             photoViewModel.setButtonEnabled(false)
                         }
                     }
                 ) {
                     Text(
                         text = if (audioState.isRecording) "Stop" else "Start"
-                    )
-                }
-                Button(
-                    onClick = {
-                        viewModel.setStopButtonEnabled(false)
-                        viewModel.setStartButtonEnabled(true)
-                        viewModel.stop(audioUri = audioFile.toURI().toString()) { text ->
-                            chatViewModel.receiveVoiceMessage(text = text)
-                        }
-                    },
-                    enabled = audioState.stopButtonEnabled
-                ) {
-                    Text(
-                        text = "Stop"
                     )
                 }
             }
@@ -151,13 +139,7 @@ fun VoiceTextScreen(
                     text = "Take photo"
                 )
             }
-            Text(
-                text = "chatViewModel.transcription?.orEmpty()"
-            )
             Spacer(modifier = Modifier.height(24.dp))
-            photoState.recognizedText?.let {
-                Text("Detected Text: $it")
-            }
             LazyColumn(
                 modifier = Modifier
                     .padding(innerPadding)

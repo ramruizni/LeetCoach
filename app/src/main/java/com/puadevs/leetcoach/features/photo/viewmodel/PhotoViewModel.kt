@@ -13,6 +13,9 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+// TODO: Stop saving the URI to show the photo. Instead, send the message as we do with audio
+
+
 data class PhotoState(
    val photoUri: String? = null,
    val recognizedText: String? = null,
@@ -38,6 +41,7 @@ class PhotoViewModel @Inject constructor(
       _photoState.update { it.copy(buttonEnabled = buttonEnabled) }
    }
 
+   // TODO: Use an onSuccess callback like on VoiceTextViewModel
    fun getRecognizedText(stringUri: String) {
       viewModelScope.launch(Dispatchers.IO) {
          val text = retrieveTextFrom(imageUri = stringUri)
