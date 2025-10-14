@@ -18,6 +18,8 @@ data class VoiceTextState(
     val startButtonEnabled: Boolean = true,
     val stopButtonEnabled: Boolean = false,
     val error: String? = null,
+    val transcription: String = "",
+    val isRecording: Boolean = false,
 )
 
 @HiltViewModel
@@ -37,12 +39,8 @@ class VoiceTextViewModel @Inject constructor(
         }
     }
 
-    fun setStartButtonEnabled(startButtonEnabled: Boolean) {
-        _audioState.update { it.copy(startButtonEnabled = startButtonEnabled) }
-    }
-
-    fun setStopButtonEnabled(stopButtonEnabled: Boolean) {
-        _audioState.update { it.copy(stopButtonEnabled = stopButtonEnabled) }
+    fun setIsRecording(isRecording: Boolean) {
+        _audioState.update { it.copy(isRecording = isRecording) }
     }
 
     fun start(audioUri: String) {
