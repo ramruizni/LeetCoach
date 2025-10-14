@@ -13,8 +13,11 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-data class AudioState(
+data class VoiceTextState(
     val permissionGranted: Boolean = false,
+    val startButtonEnabled: Boolean = true,
+    val stopButtonEnabled: Boolean = false,
+    val error: String? = null,
     val transcription: String = "",
     val isRecording: Boolean = false,
 )
@@ -26,15 +29,14 @@ class VoiceTextViewModel @Inject constructor(
     private val stopRecording: StopRecording,
 ) : ViewModel() {
 
-    private val _audioState = MutableStateFlow(AudioState())
+    private val _audioState = MutableStateFlow(VoiceTextState())
     val audioState = _audioState.asStateFlow()
 
     fun setPermissionGranted(permissionGranted: Boolean) {
         _audioState.update { it.copy(permissionGranted = permissionGranted) }
-    }
-
-    fun setTranscription(transcription: String) {
-        _audioState.update { it.copy(transcription = transcription) }
+        if (!permissionGranted) {
+            _audioState.update { it.copy(error = "Permission not granted") }
+        }
     }
 
     fun setIsRecording(isRecording: Boolean) {
@@ -47,15 +49,14 @@ class VoiceTextViewModel @Inject constructor(
         }
     }
 
-    fun stop(audioUri: String) {
+    fun stop(audioUri: String, onSuccess: (text: String) -> Unit) {
         viewModelScope.launch(Dispatchers.IO) {
-            _audioState.update { it.copy(transcription = "Transcribing") }
             stopRecording()
             val transcript = retrieveVoiceTextFrom(audioUri)
             if (transcript != null) {
-                _audioState.update { it.copy(transcription = transcript) }
+                onSuccess(transcript)
             } else {
-                _audioState.update { it.copy(transcription = "It was not possible to obtain the transcript\n") }
+                _audioState.update { it.copy(error = "It was not possible to obtain the transcript\n") }
             }
         }
     }

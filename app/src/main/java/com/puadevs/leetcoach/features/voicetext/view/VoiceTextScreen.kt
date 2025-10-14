@@ -33,12 +33,14 @@ import java.io.File
 
 @Composable
 fun VoiceTextScreen(
+    // TODO: Inject ChatViewModel
     viewModel: VoiceTextViewModel = viewModel(),
     photoViewModel: PhotoViewModel = viewModel()
 ) {
     val context = LocalContext.current
 
     val audioState by viewModel.audioState.collectAsStateWithLifecycle()
+    // TODO: Collect state from chatViewModel
     val photoState by photoViewModel.photoState.collectAsStateWithLifecycle()
 
     val audioFile = remember {
@@ -68,9 +70,6 @@ fun VoiceTextScreen(
         ActivityResultContracts.RequestPermission()
     ) { granted ->
         viewModel.setPermissionGranted(granted)
-        if (!granted) {
-            viewModel.setTranscription("Audio recording permission denied.")
-        }
     }
 
     LaunchedEffect(Unit) {
@@ -108,7 +107,10 @@ fun VoiceTextScreen(
                 Button(
                     onClick = {
                         if (audioState.isRecording) {
-                            viewModel.stop(audioUri = audioFile.toURI().toString())
+                            viewModel.stop(audioUri = audioFile.toURI().toString()) { text ->
+                                // TODO: Send message to ChatVM
+                                //chatViewModel.sendMessage(text)
+                            }
                             viewModel.setIsRecording(false)
                             photoViewModel.setButtonEnabled(true)
                         } else {
@@ -134,7 +136,7 @@ fun VoiceTextScreen(
                 }
             }
             Text(
-                text = audioState.transcription
+                text = "chatViewModel.transcription?.orEmpty()"
             )
             Spacer(modifier = Modifier.height(24.dp))
             photoState.recognizedText?.let {
