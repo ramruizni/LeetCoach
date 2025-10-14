@@ -5,7 +5,7 @@ import com.puadevs.leetcoach.chat.domain.ChatRepository
 class ChatRepositoryImpl(
     private val chatDataSource: ChatDataSource
 ): ChatRepository {
-    override suspend fun sendMessage(userMessage: String): String {
+    override suspend fun sendMessage(userMessage: String): String? {
         return chatDataSource.sendMessage(userMessage)
     }
 }

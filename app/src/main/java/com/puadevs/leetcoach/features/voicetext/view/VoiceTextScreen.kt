@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.Button
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -28,19 +29,20 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.rememberAsyncImagePainter
 import com.puadevs.leetcoach.features.photo.viewmodel.PhotoViewModel
+import com.puadevs.leetcoach.features.chat.viewmodel.ChatViewModel
 import com.puadevs.leetcoach.features.voicetext.viewmodel.VoiceTextViewModel
 import java.io.File
 
 @Composable
 fun VoiceTextScreen(
-    // TODO: Inject ChatViewModel
     viewModel: VoiceTextViewModel = viewModel(),
+    chatViewModel: ChatViewModel = viewModel(),
     photoViewModel: PhotoViewModel = viewModel()
 ) {
     val context = LocalContext.current
 
     val audioState by viewModel.audioState.collectAsStateWithLifecycle()
-    // TODO: Collect state from chatViewModel
+    val chatState by chatViewModel.chatState.collectAsStateWithLifecycle()
     val photoState by photoViewModel.photoState.collectAsStateWithLifecycle()
 
     val audioFile = remember {
@@ -126,14 +128,28 @@ fun VoiceTextScreen(
                 }
                 Button(
                     onClick = {
-                        cameraLauncher.launch(uri)
+                        viewModel.setStopButtonEnabled(false)
+                        viewModel.setStartButtonEnabled(true)
+                        viewModel.stop(audioUri = audioFile.toURI().toString()) { text ->
+                            chatViewModel.receiveVoiceMessage(text = text)
+                        }
                     },
-                    enabled = photoState.buttonEnabled
+                    enabled = audioState.stopButtonEnabled
                 ) {
                     Text(
-                        text = "Take photo"
+                        text = "Stop"
                     )
                 }
+            }
+            Button(
+                onClick = {
+                    cameraLauncher.launch(uri)
+                },
+                enabled = photoState.buttonEnabled
+            ) {
+                Text(
+                    text = "Take photo"
+                )
             }
             Text(
                 text = "chatViewModel.transcription?.orEmpty()"
@@ -141,6 +157,20 @@ fun VoiceTextScreen(
             Spacer(modifier = Modifier.height(24.dp))
             photoState.recognizedText?.let {
                 Text("Detected Text: $it")
+            }
+            LazyColumn(
+                modifier = Modifier
+                    .padding(innerPadding)
+                    .padding(24.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+            ) {
+                items(
+                    count = chatState.size
+                ) {
+                    Text(
+                        text = chatState[it]
+                    )
+                }
             }
         }
     }
