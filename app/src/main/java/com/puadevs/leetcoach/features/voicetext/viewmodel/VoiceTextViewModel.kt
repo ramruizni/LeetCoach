@@ -18,7 +18,6 @@ data class VoiceTextState(
     val startButtonEnabled: Boolean = true,
     val stopButtonEnabled: Boolean = false,
     val error: String? = null,
-    val transcription: String = "",
     val isRecording: Boolean = false,
 )
 

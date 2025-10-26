@@ -72,32 +72,32 @@ dependencies {
     debugImplementation(libs.androidx.compose.ui.tooling)
     debugImplementation(libs.androidx.compose.ui.test.manifest)
 
-    // Retrofit
+    // retrofit
     implementation(libs.retrofit)
     implementation(libs.converter.gson)
     implementation(libs.okhttp)
 
-    //Hilt
+    // hilt
     implementation(libs.hilt.android)
     ksp(libs.hilt.android.compiler)
 
-    // MLKit dependencies
+    // mlkit
     implementation(libs.androidx.activity.compose.v190)
     implementation(libs.text.recognition)
 
-    // CanHub Image Cropper
+    // cropper
     implementation(libs.android.image.cropper)
     implementation(libs.android.image.cropper.v450)
 
-    //koroutines
+    // coroutines
     implementation(libs.kotlinx.coroutines.play.services)
 
     // interceptor
     implementation(libs.logging.interceptor)
 
-    //viewModel
+    // viewModel
     implementation(libs.androidx.lifecycle.viewmodel.compose)
 
-    //coil
+    // coil
     implementation(libs.coil.compose)
 }

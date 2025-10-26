@@ -2,7 +2,6 @@ package com.puadevs.leetcoach.voicetext.di
 
 import com.google.gson.GsonBuilder
 import com.puadevs.leetcoach.BuildConfig
-import com.puadevs.leetcoach.di.VoiceTextRetrofit
 import com.puadevs.leetcoach.voicetext.Constants.AI_BASE_URL_OPEN_AI
 import com.puadevs.leetcoach.voicetext.datasource.VoiceDataSourceImpl
 import com.puadevs.leetcoach.voicetext.datasource.remote.WhisperApi
@@ -20,11 +19,16 @@ import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
+import javax.inject.Qualifier
 import javax.inject.Singleton
 
 @Module
 @InstallIn(SingletonComponent::class)
 object VoiceTextModule {
+
+    @Qualifier
+    @Retention(AnnotationRetention.BINARY)
+    annotation class VoiceTextRetrofit
 
     @Singleton
     @Provides

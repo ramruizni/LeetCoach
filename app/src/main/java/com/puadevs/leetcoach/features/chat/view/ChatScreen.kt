@@ -34,7 +34,7 @@ import com.puadevs.leetcoach.features.voicetext.viewmodel.VoiceTextViewModel
 import java.io.File
 
 @Composable
-fun VoiceTextScreen(
+fun ChatScreen(
     chatViewModel: ChatViewModel = viewModel(),
     photoViewModel: PhotoViewModel = viewModel(),
     voiceTextViewModel: VoiceTextViewModel = viewModel(),

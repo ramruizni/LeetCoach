@@ -1,27 +1,27 @@
 package com.puadevs.leetcoach.chat.datasource
 
 import android.util.Log
-import com.puadevs.leetcoach.chat.Constants.AI_MISTRAL_MODEL
-import com.puadevs.leetcoach.chat.datasource.remote.LLMApi
+import com.puadevs.leetcoach.chat.Constants.CHAT_LLM_MODEL
+import com.puadevs.leetcoach.chat.datasource.remote.ChatApi
 import com.puadevs.leetcoach.chat.domain.models.ChatRequest
 import com.puadevs.leetcoach.chat.domain.models.Message
 import com.puadevs.leetcoach.chat.repository.ChatDataSource
 
 class ChatDataSourceImpl(
-    private val llmApiKey: String,
-    private val llmApi: LLMApi
+    private val api: ChatApi,
+    private val apiKey: String
 ) : ChatDataSource {
 
     override suspend fun sendMessage(userMessage: String): String? {
         return try {
             val request = ChatRequest(
-                model = AI_MISTRAL_MODEL,
+                model = CHAT_LLM_MODEL,
                 messages = listOf(
                     Message("system", "Eres un asistente útil."),
                     Message("user", userMessage)
                 )
             )
-            val response = llmApi.chat("Bearer $llmApiKey", request)
+            val response = api.chat("Bearer $apiKey", request)
 
             response.choices.firstOrNull()?.message?.content.orEmpty()
                 .ifBlank { "El modelo no devolvió respuesta" }
