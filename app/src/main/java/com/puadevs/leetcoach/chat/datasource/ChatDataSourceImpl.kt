@@ -3,7 +3,8 @@ package com.puadevs.leetcoach.chat.datasource
 import android.util.Log
 import com.puadevs.leetcoach.chat.Constants.CHAT_LLM_MODEL
 import com.puadevs.leetcoach.chat.datasource.remote.ChatApi
-import com.puadevs.leetcoach.chat.domain.models.ChatRequest
+import com.puadevs.leetcoach.chat.datasource.dtos.ChatRequestDto
+import com.puadevs.leetcoach.chat.datasource.dtos.MessageDto
 import com.puadevs.leetcoach.chat.domain.models.Message
 import com.puadevs.leetcoach.chat.repository.ChatDataSource
 
@@ -14,11 +15,11 @@ class ChatDataSourceImpl(
 
     override suspend fun sendMessage(userMessage: String): String? {
         return try {
-            val request = ChatRequest(
+            val request = ChatRequestDto(
                 model = CHAT_LLM_MODEL,
                 messages = listOf(
-                    Message("system", "Eres un asistente útil."),
-                    Message("user", userMessage)
+                    MessageDto("system", "Eres un asistente útil."),
+                    MessageDto("user", userMessage)
                 )
             )
             val response = api.chat("Bearer $apiKey", request)
