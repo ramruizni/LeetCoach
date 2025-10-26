@@ -2,7 +2,6 @@ package com.puadevs.leetcoach.features.chat.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.puadevs.leetcoach.chat.domain.usecases.GetProblemDescription
 import com.puadevs.leetcoach.chat.domain.usecases.SendMessage
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
@@ -20,16 +19,8 @@ data class ChatState(
 
 @HiltViewModel
 class ChatViewModel @Inject constructor(
-    private val sendMessage: SendMessage,
-    private val getProblemDescription: GetProblemDescription
+    private val sendMessage: SendMessage
 ) : ViewModel() {
-
-    init {
-        viewModelScope.launch(Dispatchers.IO) {
-            val desc = getProblemDescription(28)
-            println(desc)
-        }
-    }
 
     private val _state = MutableStateFlow(ChatState())
     val state = _state.asStateFlow()
@@ -40,13 +31,8 @@ class ChatViewModel @Inject constructor(
     fun receiveMessage(text: String) {
         viewModelScope.launch(Dispatchers.IO) {
             _state.update { it.copy(isLoading = true) }
-            val response = sendMessage(text)
+            sendMessage(text)
             _state.update { it.copy(isLoading = false) }
-            if (response != null) {
-
-            } else {
-                _events.send(Event.ShowMessage("It was not possible to send the message"))
-            }
         }
     }
 

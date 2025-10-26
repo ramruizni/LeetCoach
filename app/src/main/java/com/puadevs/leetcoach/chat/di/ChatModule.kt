@@ -8,7 +8,6 @@ import com.puadevs.leetcoach.chat.datasource.ChatDataSourceImpl
 import com.puadevs.leetcoach.chat.datasource.remote.ChatApi
 import com.puadevs.leetcoach.chat.datasource.remote.LeetCodeApi
 import com.puadevs.leetcoach.chat.domain.ChatRepository
-import com.puadevs.leetcoach.chat.domain.usecases.GetProblemDescription
 import com.puadevs.leetcoach.chat.domain.usecases.SendMessage
 import com.puadevs.leetcoach.chat.repository.ChatDataSource
 import com.puadevs.leetcoach.chat.repository.ChatRepositoryImpl
@@ -86,10 +85,4 @@ object ChatModule {
     fun provideSendMessage(
         chatRepository: ChatRepository
     ): SendMessage = SendMessage(chatRepository)
-
-    @Singleton
-    @Provides
-    fun provideGetProblemDescription(
-        chatRepository: ChatRepository
-    ): GetProblemDescription = GetProblemDescription(chatRepository)
 }

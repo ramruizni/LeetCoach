@@ -1,15 +1,18 @@
 package com.puadevs.leetcoach.chat.datasource
 
 import android.content.Context
-import android.util.Log
 import com.puadevs.leetcoach.chat.Constants.CHAT_LLM_MODEL
-import com.puadevs.leetcoach.chat.datasource.remote.ChatApi
-import com.puadevs.leetcoach.chat.datasource.remote.LeetCodeApi
+import com.puadevs.leetcoach.chat.datasource.converters.toDto
 import com.puadevs.leetcoach.chat.datasource.dtos.ChatRequestDto
 import com.puadevs.leetcoach.chat.datasource.dtos.GraphQLRequestDto
-import com.puadevs.leetcoach.chat.datasource.dtos.MessageDto
+import com.puadevs.leetcoach.chat.datasource.remote.ChatApi
+import com.puadevs.leetcoach.chat.datasource.remote.LeetCodeApi
 import com.puadevs.leetcoach.chat.domain.models.Message
+import com.puadevs.leetcoach.chat.domain.models.MessageRole
 import com.puadevs.leetcoach.chat.repository.ChatDataSource
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.runBlocking
 
 class ChatDataSourceImpl(
@@ -18,6 +21,8 @@ class ChatDataSourceImpl(
     private val leetCodeApi: LeetCodeApi,
     private val apiKey: String
 ) : ChatDataSource {
+
+    private val _messages: MutableStateFlow<List<Message>> = MutableStateFlow(emptyList())
 
     private val problemMapping: Map<Int, String> by lazy {
         runBlocking {
@@ -34,7 +39,7 @@ class ChatDataSourceImpl(
             .use { it.readText() }
     }
 
-    override suspend fun getProblemDescription(number: Int): String? {
+    private suspend fun getProblemDescription(number: Int): String? {
         val titleSlug = problemMapping[number]
             ?: return null
 
@@ -67,23 +72,46 @@ class ChatDataSourceImpl(
         }
     }
 
-    override suspend fun sendMessage(userMessage: String): String? {
-        return try {
-            val request = ChatRequestDto(
-                model = CHAT_LLM_MODEL,
-                messages = listOf(
-                    MessageDto("system", systemPrompt),
-                    MessageDto("user", userMessage)
-                )
-            )
-            val response = api.chat("Bearer $apiKey", request)
-
-            response.choices.firstOrNull()?.message?.content.orEmpty()
-                .ifBlank { "No answer received." }
-        } catch (e: Exception) {
-            Log.e(TAG, "Chat response failed: ${e.message}")
-            null
+    override suspend fun startNewChat(problemNumber: Int) {
+        _messages.value = emptyList()
+        val description = getProblemDescription(problemNumber)
+        if (description == null) {
+            _messages.value = listOf(Message(MessageRole.ASSISTANT, "Problem not found"))
+            return
         }
+
+        _messages.value = listOf(
+            Message(MessageRole.SYSTEM, systemPrompt),
+            Message(MessageRole.SYSTEM, description)
+        )
+    }
+
+    override fun observeMessages(): Flow<List<Message>> {
+        return _messages.asStateFlow()
+    }
+
+    override suspend fun sendMessage(text: String) {
+        val updatedMessages = _messages.value + Message(MessageRole.USER, text)
+        _messages.value = updatedMessages
+
+        val request = ChatRequestDto(
+            model = CHAT_LLM_MODEL,
+            messages = updatedMessages.map(Message::toDto)
+        )
+
+        val content = runCatching {
+            api.chat("Bearer $apiKey", request)
+                .choices
+                .firstOrNull()
+                ?.message
+                ?.content
+                ?: "(No response)"
+        }.getOrElse { e ->
+            e.printStackTrace()
+            "(Error: ${e.message})"
+        }
+
+        _messages.value = updatedMessages + Message(MessageRole.ASSISTANT, content)
     }
 
     companion object {
