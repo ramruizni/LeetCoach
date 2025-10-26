@@ -13,47 +13,40 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-// TODO: Stop saving the URI to show the photo. Instead, send the message as we do with audio
-
-
 data class PhotoState(
-   val photoUri: String? = null,
-   val recognizedText: String? = null,
-   val buttonEnabled: Boolean = true
+    val isLoading: Boolean = false,
+    val buttonEnabled: Boolean = true
 )
+
 @HiltViewModel
 class PhotoViewModel @Inject constructor(
-   private val retrieveTextFrom: RetrieveTextFrom,
-    // TODO: Inject observe all messages use case
-): ViewModel() {
+    private val retrieveTextFrom: RetrieveTextFrom
+) : ViewModel() {
 
-   private val _photoState = MutableStateFlow(PhotoState())
-   val photoState = _photoState.asStateFlow()
+    private val _state = MutableStateFlow(PhotoState())
+    val state = _state.asStateFlow()
 
-   private val _events = Channel<Event>()
-   val events = _events.receiveAsFlow()
+    private val _events = Channel<Event>()
+    val events = _events.receiveAsFlow()
 
-   fun setPhotoUri(photoUri: String) {
-      _photoState.update { it.copy(photoUri = photoUri) }
-   }
+    fun setButtonEnabled(buttonEnabled: Boolean) {
+        _state.update { it.copy(buttonEnabled = buttonEnabled) }
+    }
 
-   fun setButtonEnabled(buttonEnabled: Boolean) {
-      _photoState.update { it.copy(buttonEnabled = buttonEnabled) }
-   }
+    fun getRecognizedText(imageUri: String, onSuccess: (text: String) -> Unit) {
+        viewModelScope.launch(Dispatchers.IO) {
+            _state.update { it.copy(isLoading = true) }
+            val transcript = retrieveTextFrom(imageUri = imageUri)
+            _state.update { it.copy(isLoading = false) }
+            if (transcript != null) {
+                onSuccess(transcript)
+            } else {
+                _events.send(Event.ShowMessage("It was not possible to read the image"))
+            }
+        }
+    }
 
-   // TODO: Use an onSuccess callback like on VoiceTextViewModel
-   fun getRecognizedText(stringUri: String) {
-      viewModelScope.launch(Dispatchers.IO) {
-         val text = retrieveTextFrom(imageUri = stringUri)
-         if (text != null) {
-            _photoState.update { it.copy(recognizedText = text) }
-         } else {
-            _events.send(Event.ShowMessage("It was not possible to read the image"))
-         }
-      }
-   }
-
-   sealed class Event{
-      data class ShowMessage(val message: String): Event()
-   }
+    sealed class Event {
+        data class ShowMessage(val message: String) : Event()
+    }
 }

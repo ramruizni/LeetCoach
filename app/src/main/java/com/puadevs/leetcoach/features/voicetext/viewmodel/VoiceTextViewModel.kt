@@ -7,17 +7,19 @@ import com.puadevs.leetcoach.voicetext.domain.usecases.StartRecording
 import com.puadevs.leetcoach.voicetext.domain.usecases.StopRecording
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 data class VoiceTextState(
+    val isLoading: Boolean = false,
     val permissionGranted: Boolean = false,
     val startButtonEnabled: Boolean = true,
     val stopButtonEnabled: Boolean = false,
-    val error: String? = null,
     val isRecording: Boolean = false,
 )
 
@@ -28,18 +30,23 @@ class VoiceTextViewModel @Inject constructor(
     private val stopRecording: StopRecording,
 ) : ViewModel() {
 
-    private val _audioState = MutableStateFlow(VoiceTextState())
-    val audioState = _audioState.asStateFlow()
+    private val _state = MutableStateFlow(VoiceTextState())
+    val state = _state.asStateFlow()
+
+    private val _events = Channel<Event>()
+    val events = _events.receiveAsFlow()
 
     fun setPermissionGranted(permissionGranted: Boolean) {
-        _audioState.update { it.copy(permissionGranted = permissionGranted) }
+        _state.update { it.copy(permissionGranted = permissionGranted) }
         if (!permissionGranted) {
-            _audioState.update { it.copy(error = "Permission not granted") }
+            viewModelScope.launch {
+                _events.send(Event.ShowMessage("Permission not granted"))
+            }
         }
     }
 
     fun setIsRecording(isRecording: Boolean) {
-        _audioState.update { it.copy(isRecording = isRecording) }
+        _state.update { it.copy(isRecording = isRecording) }
     }
 
     fun start(audioUri: String) {
@@ -50,13 +57,19 @@ class VoiceTextViewModel @Inject constructor(
 
     fun stop(audioUri: String, onSuccess: (text: String) -> Unit) {
         viewModelScope.launch(Dispatchers.IO) {
+            _state.update { it.copy(isLoading = true) }
             stopRecording()
             val transcript = retrieveVoiceTextFrom(audioUri)
+            _state.update { it.copy(isLoading = false) }
             if (transcript != null) {
                 onSuccess(transcript)
             } else {
-                _audioState.update { it.copy(error = "It was not possible to obtain the transcript\n") }
+                _events.send(Event.ShowMessage("It was not possible to obtain the transcript"))
             }
         }
+    }
+
+    sealed class Event {
+        data class ShowMessage(val message: String) : Event()
     }
 }
