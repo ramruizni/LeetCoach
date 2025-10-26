@@ -8,4 +8,8 @@ class ChatRepositoryImpl(
     override suspend fun sendMessage(userMessage: String): String? {
         return chatDataSource.sendMessage(userMessage)
     }
+
+    override suspend fun getProblemDescription(number: Int): String? {
+        return chatDataSource.getProblemDescription(number)
+    }
 }

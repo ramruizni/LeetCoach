@@ -6,7 +6,9 @@ import com.puadevs.leetcoach.BuildConfig
 import com.puadevs.leetcoach.chat.Constants.CHAT_API_BASE_URL
 import com.puadevs.leetcoach.chat.datasource.ChatDataSourceImpl
 import com.puadevs.leetcoach.chat.datasource.remote.ChatApi
+import com.puadevs.leetcoach.chat.datasource.remote.LeetCodeApi
 import com.puadevs.leetcoach.chat.domain.ChatRepository
+import com.puadevs.leetcoach.chat.domain.usecases.GetProblemDescription
 import com.puadevs.leetcoach.chat.domain.usecases.SendMessage
 import com.puadevs.leetcoach.chat.repository.ChatDataSource
 import com.puadevs.leetcoach.chat.repository.ChatRepositoryImpl
@@ -28,6 +30,10 @@ object ChatModule {
     @Retention(AnnotationRetention.BINARY)
     annotation class ChatRetrofit
 
+    @Qualifier
+    @Retention(AnnotationRetention.BINARY)
+    annotation class LeetCodeRetrofit
+
     @Singleton
     @Provides
     @ChatRetrofit
@@ -38,17 +44,32 @@ object ChatModule {
 
     @Singleton
     @Provides
-    fun provideLLMAPI(@ChatRetrofit retrofit: Retrofit): ChatApi =
+    @LeetCodeRetrofit
+    fun provideLeetCodeRetrofit(): Retrofit = Retrofit.Builder()
+        .baseUrl("https://leetcode.com/")
+        .addConverterFactory(GsonConverterFactory.create(GsonBuilder().create()))
+        .build()
+
+    @Singleton
+    @Provides
+    fun provideChatApi(@ChatRetrofit retrofit: Retrofit): ChatApi =
         retrofit.create(ChatApi::class.java)
+
+    @Singleton
+    @Provides
+    fun provideLeetCodeApi(@LeetCodeRetrofit retrofit: Retrofit): LeetCodeApi =
+        retrofit.create(LeetCodeApi::class.java)
 
     @Singleton
     @Provides
     fun provideChatDataSource(
         @ApplicationContext appContext: Context,
-        api: ChatApi
+        api: ChatApi,
+        leetCodeApi: LeetCodeApi
     ): ChatDataSource = ChatDataSourceImpl(
         context = appContext,
         api = api,
+        leetCodeApi = leetCodeApi,
         apiKey = BuildConfig.API_KEY_OPEN_ROUTER,
     )
 
@@ -65,4 +86,10 @@ object ChatModule {
     fun provideSendMessage(
         chatRepository: ChatRepository
     ): SendMessage = SendMessage(chatRepository)
+
+    @Singleton
+    @Provides
+    fun provideGetProblemDescription(
+        chatRepository: ChatRepository
+    ): GetProblemDescription = GetProblemDescription(chatRepository)
 }
