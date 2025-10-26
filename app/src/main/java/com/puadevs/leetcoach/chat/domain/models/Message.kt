@@ -1,12 +1,12 @@
 package com.puadevs.leetcoach.chat.domain.models
 
 enum class MessageRole {
+    SYSTEM,
     USER,
-    SYSTEM
+    ASSISTANT
 }
 
 data class Message(
     val role: MessageRole,
     val content: String
 )
-

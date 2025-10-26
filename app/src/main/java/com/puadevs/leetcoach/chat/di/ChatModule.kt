@@ -1,5 +1,6 @@
 package com.puadevs.leetcoach.chat.di
 
+import android.content.Context
 import com.google.gson.GsonBuilder
 import com.puadevs.leetcoach.BuildConfig
 import com.puadevs.leetcoach.chat.Constants.CHAT_API_BASE_URL
@@ -12,6 +13,7 @@ import com.puadevs.leetcoach.chat.repository.ChatRepositoryImpl
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
+import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
@@ -42,8 +44,10 @@ object ChatModule {
     @Singleton
     @Provides
     fun provideChatDataSource(
+        @ApplicationContext appContext: Context,
         api: ChatApi
     ): ChatDataSource = ChatDataSourceImpl(
+        context = appContext,
         api = api,
         apiKey = BuildConfig.API_KEY_OPEN_ROUTER,
     )
