@@ -11,14 +11,14 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 data class StartState(
     val isLoading: Boolean = false,
-    val problemNumber: String = ""
 )
 
 @HiltViewModel
-class StartViewModel(
+class StartViewModel @Inject constructor(
     private val startNewChat: StartNewChat,
 ) : ViewModel() {
 
@@ -28,24 +28,18 @@ class StartViewModel(
     private val _events = Channel<Event>()
     val events = _events.receiveAsFlow()
 
-    fun setProblemNumber(text: String) {
-        _state.update { it.copy(problemNumber = text) }
-    }
-
-    fun validateForm() {
-
-    }
-
     fun start(problemNumber: Int) {
         viewModelScope.launch(Dispatchers.IO) {
-            _state.update { it.copy(isLoading = true) }
+            /*_state.update { it.copy(isLoading = true) }
             val description = startNewChat(problemNumber)
             _state.update { it.copy(isLoading = false) }
             if (description == null) {
                 _events.send(Event.NavigateToChat)
             } else {
                 _events.send(Event.ShowToast("Couldn't fetch problem"))
-            }
+            }*/
+
+            _events.send(Event.NavigateToChat)
         }
     }
 

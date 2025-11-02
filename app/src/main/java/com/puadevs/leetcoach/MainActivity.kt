@@ -4,18 +4,20 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import com.puadevs.leetcoach.features.chat.view.ChatScreen
+import com.puadevs.leetcoach.navigation.NavigationHost
 import com.puadevs.leetcoach.ui.theme.LeetCoachTheme
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+
         setContent {
             LeetCoachTheme {
-                ChatScreen()
+                NavigationHost()
             }
         }
     }

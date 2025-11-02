@@ -19,27 +19,32 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
 import com.puadevs.leetcoach.features.start.viewmodel.StartFormViewModel
 import com.puadevs.leetcoach.features.start.viewmodel.StartViewModel
+import com.puadevs.leetcoach.navigation.routes.ChatRoute
 import com.puadevs.leetcoach.ui.composable.BoxLoadingIndicator
 
 @Composable
 fun StartScreen(
-    viewModel: StartViewModel = viewModel(),
-    formViewModel: StartFormViewModel = viewModel()
+    navController: NavController,
+    viewModel: StartViewModel = hiltViewModel(),
+    formViewModel: StartFormViewModel = hiltViewModel()
 ) {
     val context = LocalContext.current
 
     val state by viewModel.state.collectAsStateWithLifecycle()
     val formState by formViewModel.state.collectAsStateWithLifecycle()
+    val formError by formViewModel.error.collectAsStateWithLifecycle()
 
     LaunchedEffect(context) {
         viewModel.events.collect { event ->
             when (event) {
                 is StartViewModel.Event.NavigateToChat -> {
-
+                    navController.navigate(ChatRoute)
                 }
 
                 is StartViewModel.Event.ShowToast -> {
@@ -65,8 +70,10 @@ fun StartScreen(
                 Spacer(Modifier.height(12.dp))
                 TextField(
                     value = formState.problemNumber,
-                    onValueChange = { formViewModel.setProblemNumber(it) }
+                    onValueChange = { formViewModel.setProblemNumber(it) },
+                    isError = formError.problemNumber != null
                 )
+                formError.problemNumber?.let { Text(it) }
                 Spacer(Modifier.height(12.dp))
                 Button(
                     onClick = {

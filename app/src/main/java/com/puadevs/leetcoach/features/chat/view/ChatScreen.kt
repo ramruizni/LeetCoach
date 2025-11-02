@@ -20,8 +20,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.core.content.FileProvider
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.puadevs.leetcoach.features.chat.viewmodel.ChatViewModel
 import com.puadevs.leetcoach.features.photo.viewmodel.PhotoViewModel
 import com.puadevs.leetcoach.features.voicetext.viewmodel.VoiceTextViewModel
@@ -29,9 +29,9 @@ import java.io.File
 
 @Composable
 fun ChatScreen(
-    chatViewModel: ChatViewModel = viewModel(),
-    photoViewModel: PhotoViewModel = viewModel(),
-    voiceTextViewModel: VoiceTextViewModel = viewModel(),
+    chatViewModel: ChatViewModel = hiltViewModel(),
+    photoViewModel: PhotoViewModel = hiltViewModel(),
+    voiceTextViewModel: VoiceTextViewModel = hiltViewModel(),
 ) {
     val context = LocalContext.current
 

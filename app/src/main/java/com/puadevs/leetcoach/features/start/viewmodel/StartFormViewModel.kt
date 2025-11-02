@@ -6,6 +6,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
+import javax.inject.Inject
 
 data class StartFormState(
     val problemNumber: String = ""
@@ -16,8 +17,7 @@ data class StartFormError(
 )
 
 @HiltViewModel
-class StartFormViewModel(
-) : ViewModel() {
+class StartFormViewModel @Inject constructor() : ViewModel() {
 
     private val _state = MutableStateFlow(StartFormState())
     val state = _state.asStateFlow()
