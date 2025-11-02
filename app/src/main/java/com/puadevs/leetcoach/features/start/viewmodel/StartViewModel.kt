@@ -1,52 +1,56 @@
-package com.puadevs.leetcoach.features.chat.viewmodel
+package com.puadevs.leetcoach.features.start.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.puadevs.leetcoach.chat.domain.usecases.ObserveMessages
-import com.puadevs.leetcoach.chat.domain.usecases.SendMessage
 import com.puadevs.leetcoach.chat.domain.usecases.StartNewChat
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.receiveAsFlow
-import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
-data class ChatState(
+data class StartState(
     val isLoading: Boolean = false,
+    val problemNumber: String = ""
 )
 
 @HiltViewModel
-class ChatViewModel @Inject constructor(
-    private val observeMessages: ObserveMessages,
-    private val sendMessage: SendMessage,
+class StartViewModel(
+    private val startNewChat: StartNewChat,
 ) : ViewModel() {
 
-    private val _state = MutableStateFlow(ChatState())
+    private val _state = MutableStateFlow(StartState())
     val state = _state.asStateFlow()
-
-    val messages = observeMessages()
-        .flowOn(Dispatchers.IO)
-        .stateIn(viewModelScope, SharingStarted.Lazily, emptyList())
 
     private val _events = Channel<Event>()
     val events = _events.receiveAsFlow()
 
-    fun receiveMessage(text: String) {
+    fun setProblemNumber(text: String) {
+        _state.update { it.copy(problemNumber = text) }
+    }
+
+    fun validateForm() {
+
+    }
+
+    fun start(problemNumber: Int) {
         viewModelScope.launch(Dispatchers.IO) {
             _state.update { it.copy(isLoading = true) }
-            sendMessage(text)
+            val description = startNewChat(problemNumber)
             _state.update { it.copy(isLoading = false) }
+            if (description == null) {
+                _events.send(Event.NavigateToChat)
+            } else {
+                _events.send(Event.ShowToast("Couldn't fetch problem"))
+            }
         }
     }
 
     sealed class Event {
-        data class ShowMessage(val message: String) : Event()
+        data object NavigateToChat : Event()
+        data class ShowToast(val message: String) : Event()
     }
 }

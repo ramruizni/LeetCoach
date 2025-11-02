@@ -5,7 +5,7 @@ import kotlinx.coroutines.flow.Flow
 
 interface ChatRepository {
 
-    suspend fun startNewChat(problemNumber: Int)
+    suspend fun startNewChat(problemNumber: Int): String?
 
     fun observeMessages(): Flow<List<Message>>
 

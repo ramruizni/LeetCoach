@@ -72,18 +72,20 @@ class ChatDataSourceImpl(
         }
     }
 
-    override suspend fun startNewChat(problemNumber: Int) {
+    override suspend fun startNewChat(problemNumber: Int): String? {
         _messages.value = emptyList()
         val description = getProblemDescription(problemNumber)
         if (description == null) {
             _messages.value = listOf(Message(MessageRole.ASSISTANT, "Problem not found"))
-            return
+            return null
         }
 
         _messages.value = listOf(
             Message(MessageRole.SYSTEM, systemPrompt),
             Message(MessageRole.SYSTEM, description)
         )
+
+        return description
     }
 
     override fun observeMessages(): Flow<List<Message>> {

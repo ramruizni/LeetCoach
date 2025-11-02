@@ -8,7 +8,7 @@ class ChatRepositoryImpl(
     private val chatDataSource: ChatDataSource
 ) : ChatRepository {
 
-    override suspend fun startNewChat(problemNumber: Int) {
+    override suspend fun startNewChat(problemNumber: Int): String? {
         return chatDataSource.startNewChat(problemNumber)
     }
 
