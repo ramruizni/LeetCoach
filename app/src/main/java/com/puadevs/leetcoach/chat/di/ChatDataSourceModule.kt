@@ -7,10 +7,7 @@ import com.puadevs.leetcoach.chat.Constants.CHAT_API_BASE_URL
 import com.puadevs.leetcoach.chat.datasource.ChatDataSourceImpl
 import com.puadevs.leetcoach.chat.datasource.remote.ChatApi
 import com.puadevs.leetcoach.chat.datasource.remote.LeetCodeApi
-import com.puadevs.leetcoach.chat.domain.ChatRepository
-import com.puadevs.leetcoach.chat.domain.usecases.SendMessage
 import com.puadevs.leetcoach.chat.repository.ChatDataSource
-import com.puadevs.leetcoach.chat.repository.ChatRepositoryImpl
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -23,7 +20,7 @@ import javax.inject.Singleton
 
 @Module
 @InstallIn(SingletonComponent::class)
-object ChatModule {
+object ChatDataSourceModule {
 
     @Qualifier
     @Retention(AnnotationRetention.BINARY)
@@ -71,18 +68,4 @@ object ChatModule {
         leetCodeApi = leetCodeApi,
         apiKey = BuildConfig.API_KEY_OPEN_ROUTER,
     )
-
-    @Singleton
-    @Provides
-    fun provideChatRepository(
-        chatDataSource: ChatDataSource
-    ): ChatRepository = ChatRepositoryImpl(
-        chatDataSource = chatDataSource
-    )
-
-    @Singleton
-    @Provides
-    fun provideSendMessage(
-        chatRepository: ChatRepository
-    ): SendMessage = SendMessage(chatRepository)
 }
