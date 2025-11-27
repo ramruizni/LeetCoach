@@ -6,8 +6,13 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.Button
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -38,6 +43,8 @@ fun ChatScreen(
     val audioState by voiceTextViewModel.state.collectAsStateWithLifecycle()
     val chatState by chatViewModel.state.collectAsStateWithLifecycle()
     val photoState by photoViewModel.state.collectAsStateWithLifecycle()
+
+    val messages by chatViewModel.messages.collectAsStateWithLifecycle()
 
     val audioFile = remember {
         File(context.externalCacheDir, "recorded_audio.m4a")
@@ -111,6 +118,23 @@ fun ChatScreen(
                 .padding(16.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
+            LazyColumn(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .weight(1f)
+            ) {
+                items(
+                    count = messages.size
+                ) {
+                    Text(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(8.dp),
+                        text = "${messages[it].role}\n${messages[it].content}"
+                    )
+                }
+            }
+            Spacer(modifier = Modifier.height(16.dp))
             Row {
                 Button(
                     onClick = {
@@ -133,17 +157,19 @@ fun ChatScreen(
                         text = if (audioState.isRecording) "Stop" else "Start"
                     )
                 }
+                Spacer(modifier = Modifier.width(8.dp))
+                Button(
+                    onClick = {
+                        cameraLauncher.launch(uri)
+                    },
+                    enabled = photoState.buttonEnabled
+                ) {
+                    Text(
+                        text = "Take photo"
+                    )
+                }
             }
-            Button(
-                onClick = {
-                    cameraLauncher.launch(uri)
-                },
-                enabled = photoState.buttonEnabled
-            ) {
-                Text(
-                    text = "Take photo"
-                )
-            }
+
         }
     }
 }

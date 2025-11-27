@@ -30,15 +30,13 @@ class StartViewModel @Inject constructor(
 
     fun start(problemNumber: Int) {
         viewModelScope.launch(Dispatchers.IO) {
-            /*_state.update { it.copy(isLoading = true) }
+            _state.update { it.copy(isLoading = true) }
             val description = startNewChat(problemNumber)
             _state.update { it.copy(isLoading = false) }
             if (description == null) {
-                _events.send(Event.NavigateToChat)
-            } else {
                 _events.send(Event.ShowToast("Couldn't fetch problem"))
-            }*/
-
+                return@launch
+            }
             _events.send(Event.NavigateToChat)
         }
     }
